@@ -2,6 +2,9 @@ package com.muic.ssc.backend.controller;
 
 import com.muic.ssc.backend.model.LoginRequest;
 import com.muic.ssc.backend.model.LoginResponse;
+import com.muic.ssc.backend.model.RegisterRequest;
+import com.muic.ssc.backend.model.RegisterResponse;
+import com.muic.ssc.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,15 +20,31 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
+        try {
+            userService.registerNewUser(
+                    registerRequest.getUsername(),
+                    registerRequest.getPassword()
+            );
+
+            return ResponseEntity.ok(new RegisterResponse("User registered successfully", true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new RegisterResponse(
+                    "Registration failed: " + e.getMessage(), false
+            ));
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
+            UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
 
             if (!passwordEncoder.matches(loginRequest.getPassword(), userDetails.getPassword())) {
                 throw new BadCredentialsException("Invalid credentials");
