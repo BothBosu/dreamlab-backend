@@ -33,7 +33,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
-
         return http.build();
     }
 
@@ -50,7 +49,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // Vue default port
+        // Allow both local development and production domains
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",  // Vue default local port
+                "https://dreamlab-ai.online", // Production domain
+                "http://dreamlab-ai.online" // Also allow HTTP version
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
