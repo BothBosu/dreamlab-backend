@@ -1,6 +1,9 @@
 package com.muic.ssc.backend.controller;
 
 import com.muic.ssc.backend.entity.Image;
+import com.muic.ssc.backend.model.ImageGenRequest;
+import com.muic.ssc.backend.model.ImageGenResponse;
+import com.muic.ssc.backend.service.ImageGenService;
 import com.muic.ssc.backend.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,27 @@ public class ImageController {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private ImageGenService imageGenService;
+
+    /**
+     * Generate an image based on the provided prompt and settings
+     * When a POST request is made to /api/images/generate, the generateImage method is called with the request body.
+     *
+     * @return response with the generated image URL
+     */
+    @PostMapping("/generate")
+    public ResponseEntity<ImageGenResponse> generateImage(@RequestBody ImageGenRequest request) {
+        try {
+            String imageUrl = imageGenService.generateImage(request.getPrompt(), request.getSettings());
+            ImageGenResponse response = new ImageGenResponse(true, imageUrl, "Image generated successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ImageGenResponse response = new ImageGenResponse("Failed to generate image: " + e.getMessage(), false);
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<Image> uploadImage(@RequestParam("file") MultipartFile file) {

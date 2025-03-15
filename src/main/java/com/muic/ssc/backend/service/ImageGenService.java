@@ -1,11 +1,14 @@
 package com.muic.ssc.backend.service;
 
+import com.muic.ssc.backend.utils.DebugUtils;
+
 import com.muic.ssc.backend.repository.ImageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import java.util.Map;
 
 /**
  * Author: Pawin Pothasuthon
@@ -24,4 +27,18 @@ public class ImageGenService {
     // Placeholder for API URL - to be configured in application properties
     private String imageGenerationApiUrl;
     private String apiKey;
+
+    /**
+     * Generate an image based on the provided prompt and settings
+     *
+     * @param prompt the text prompt to generate image from
+     * @param settings the generation settings (sampling method, steps, width, height, etc.)
+     * @return the URL of the generated image
+     */
+    public String generateImage(String prompt, Map<String, Object> settings) {
+        // Log detailed settings for debugging purposes
+        DebugUtils.logImageGenerationSettings(prompt, settings);
+
+        return "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Test.svg/2560px-Test.svg.png";
+    }
 }
