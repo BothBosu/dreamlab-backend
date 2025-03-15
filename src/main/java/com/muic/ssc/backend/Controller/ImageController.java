@@ -3,6 +3,7 @@ package com.muic.ssc.backend.Controller;
 import com.muic.ssc.backend.Entity.Image;
 import com.muic.ssc.backend.Model.ImageGenPageModel.ImageGenRequest;
 import com.muic.ssc.backend.Model.ImageGenPageModel.ImageGenResponse;
+import com.muic.ssc.backend.Model.ImageGenPageModel.SaveImageResponse;
 import com.muic.ssc.backend.Service.ImageGenService;
 import com.muic.ssc.backend.Service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/images")
@@ -36,6 +38,25 @@ public class ImageController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ImageGenResponse response = new ImageGenResponse("Failed to generate image: " + e.getMessage(), false);
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    /**
+     * Save a generated image to the database
+     *
+     * @param request request containing image URL and name
+     * @return response with the saved image information
+     */
+    @PostMapping("/save")
+    public ResponseEntity<SaveImageResponse> saveImage(@RequestBody com.muic.ssc.backend.model.SaveImageRequest request) {
+        try {
+            Image savedImage = imageGenService.saveGeneratedImage(request.getImageUrl(), request.getName());
+
+            SaveImageResponse response = new SaveImageResponse(true, savedImage.getId(), "Image saved successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            SaveImageResponse response = new SaveImageResponse("Failed to save image: " + e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
     }

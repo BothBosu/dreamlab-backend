@@ -1,5 +1,6 @@
 package com.muic.ssc.backend.Service;
 
+import com.muic.ssc.backend.Entity.Image;
 import com.muic.ssc.backend.Utils.DebugUtils;
 
 import com.muic.ssc.backend.Repository.ImageRepository;
@@ -40,5 +41,20 @@ public class ImageGenService {
         DebugUtils.logImageGenerationSettings(prompt, settings);
 
         return "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Test.svg/2560px-Test.svg.png";
+    }
+
+    /**
+     * Save the generated image to the database
+     *
+     * @return the saved image entity
+     */
+    public Image saveGeneratedImage(String imageUrl, String name) {
+        logger.info("Saving generated image with name: {}", name);
+
+        Image image = new Image();
+        image.setName(name);
+        image.setUrl(imageUrl);
+
+        return imageRepository.save(image);
     }
 }
