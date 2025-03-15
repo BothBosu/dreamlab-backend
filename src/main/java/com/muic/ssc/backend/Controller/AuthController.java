@@ -1,17 +1,16 @@
-package com.muic.ssc.backend.controller;
+package com.muic.ssc.backend.Controller;
 
-import com.muic.ssc.backend.model.LoginRequest;
-import com.muic.ssc.backend.model.LoginResponse;
-import com.muic.ssc.backend.model.RegisterRequest;
-import com.muic.ssc.backend.model.RegisterResponse;
-import com.muic.ssc.backend.service.UserService;
+import com.muic.ssc.backend.Model.LoginPageModel.LoginRequest;
+import com.muic.ssc.backend.Model.LoginPageModel.LoginResponse;
+import com.muic.ssc.backend.Model.RegisterPageModel.RegisterRequest;
+import com.muic.ssc.backend.Model.RegisterPageModel.RegisterResponse;
+import com.muic.ssc.backend.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 

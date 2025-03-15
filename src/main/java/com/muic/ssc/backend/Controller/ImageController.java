@@ -1,10 +1,10 @@
-package com.muic.ssc.backend.controller;
+package com.muic.ssc.backend.Controller;
 
-import com.muic.ssc.backend.entity.Image;
-import com.muic.ssc.backend.model.ImageGenRequest;
-import com.muic.ssc.backend.model.ImageGenResponse;
-import com.muic.ssc.backend.service.ImageGenService;
-import com.muic.ssc.backend.service.ImageService;
+import com.muic.ssc.backend.Entity.Image;
+import com.muic.ssc.backend.Model.ImageGenPageModel.ImageGenRequest;
+import com.muic.ssc.backend.Model.ImageGenPageModel.ImageGenResponse;
+import com.muic.ssc.backend.Service.ImageGenService;
+import com.muic.ssc.backend.Service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

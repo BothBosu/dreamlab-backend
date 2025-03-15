@@ -1,4 +1,4 @@
-package com.muic.ssc.backend.model;
+package com.muic.ssc.backend.Model.ImageGenPageModel;
 
 import java.util.Map;
 

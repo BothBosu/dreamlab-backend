@@ -1,4 +1,4 @@
-package com.muic.ssc.backend.config;
+package com.muic.ssc.backend.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

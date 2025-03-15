@@ -1,7 +1,7 @@
-package com.muic.ssc.backend.service;
+package com.muic.ssc.backend.Service;
 
-import com.muic.ssc.backend.entity.User;
-import com.muic.ssc.backend.repository.UserRepository;
+import com.muic.ssc.backend.Entity.User;
+import com.muic.ssc.backend.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,4 +1,4 @@
-package com.muic.ssc.backend.utils;
+package com.muic.ssc.backend.Utils;
 
 import java.util.Map;
 

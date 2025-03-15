@@ -1,13 +1,13 @@
-package com.muic.ssc.backend.model;
+package com.muic.ssc.backend.Model.RegisterPageModel;
 
-public class LoginRequest {
+public class RegisterRequest {
     private String username;
     private String password;
 
-    public LoginRequest() {
+    public RegisterRequest() {
     }
 
-    public LoginRequest(String username, String password) {
+    public RegisterRequest(String username, String password) {
         this.username = username;
         this.password = password;
     }

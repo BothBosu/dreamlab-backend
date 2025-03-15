@@ -1,8 +1,8 @@
-package com.muic.ssc.backend.service;
+package com.muic.ssc.backend.Service;
 
-import com.muic.ssc.backend.utils.DebugUtils;
+import com.muic.ssc.backend.Utils.DebugUtils;
 
-import com.muic.ssc.backend.repository.ImageRepository;
+import com.muic.ssc.backend.Repository.ImageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

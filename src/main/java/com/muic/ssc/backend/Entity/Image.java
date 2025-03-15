@@ -1,4 +1,4 @@
-package com.muic.ssc.backend.entity;
+package com.muic.ssc.backend.Entity;
 
 import jakarta.persistence.*;
 

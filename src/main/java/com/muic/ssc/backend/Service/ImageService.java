@@ -1,7 +1,7 @@
-package com.muic.ssc.backend.service;
+package com.muic.ssc.backend.Service;
 
-import com.muic.ssc.backend.entity.Image;
-import com.muic.ssc.backend.repository.ImageRepository;
+import com.muic.ssc.backend.Entity.Image;
+import com.muic.ssc.backend.Repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

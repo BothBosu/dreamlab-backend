@@ -1,4 +1,4 @@
-package com.muic.ssc.backend.model;
+package com.muic.ssc.backend.Model.RegisterPageModel;
 
 public class RegisterResponse {
     private String message;
