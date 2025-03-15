@@ -2,6 +2,7 @@ package com.muic.ssc.backend.Service;
 
 import com.muic.ssc.backend.Entity.User;
 import com.muic.ssc.backend.Repository.UserRepository;
+import com.muic.ssc.backend.Utils.IdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,6 +22,8 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private static final int MAX_ID_GENERATION_ATTEMPTS = 10;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -43,7 +46,20 @@ public class UserService implements UserDetailsService {
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
 
-        return userRepository.save(user);
+        // Try to find a unique ID using our utility class
+        int attempts = 0;
+
+        while (attempts < MAX_ID_GENERATION_ATTEMPTS) {
+            Long randomId = IdGenerator.generateSixDigitId();
+
+            if (!userRepository.existsById(randomId)) {
+                user.setId(randomId);
+                return userRepository.save(user);
+            }
+            attempts++;
+        }
+
+        throw new RuntimeException("Failed to generate a unique user ID after multiple attempts");
     }
 
     public List<User> getAllUsers() {

@@ -6,9 +6,8 @@ import java.util.Date;
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, unique = true)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -37,7 +36,6 @@ public class User {
     }
 
     // Getters and Setters
-
     public Long getId() {
         return id;
     }
