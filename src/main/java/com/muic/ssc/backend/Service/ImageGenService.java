@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import java.util.Map;
 
 /**
@@ -37,6 +38,7 @@ public class ImageGenService {
      * @return the URL of the generated image
      */
     public String generateImage(String prompt, Map<String, Object> settings) {
+        // TODO: Still not have the API setup yet.
         // Log detailed settings for debugging purposes
         DebugUtils.logImageGenerationSettings(prompt, settings);
 
@@ -52,7 +54,7 @@ public class ImageGenService {
         logger.info("Saving generated image with name: {}", name);
 
         Image image = new Image();
-        image.setName(name);
+        image.setInputPrompt(name);
         image.setUrl(imageUrl);
 
         return imageRepository.save(image);

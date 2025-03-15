@@ -18,3 +18,4 @@ mvnw
 mvnw.cmd
 backend.iml
 .idea/modules.xml
+package-lock.json

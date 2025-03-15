@@ -1,15 +1,15 @@
-package com.muic.ssc.backend.model;
+package com.muic.ssc.backend.Model.ImageGenPageModel;
 
 public class SaveImageRequest {
     private String imageUrl;
-    private String name;
+    private String inputPrompt;
 
     public SaveImageRequest() {
     }
 
-    public SaveImageRequest(String imageUrl, String name) {
+    public SaveImageRequest(String imageUrl, String inputPrompt) {
         this.imageUrl = imageUrl;
-        this.name = name;
+        this.inputPrompt = inputPrompt;
     }
 
     public String getImageUrl() {
@@ -20,11 +20,11 @@ public class SaveImageRequest {
         this.imageUrl = imageUrl;
     }
 
-    public String getName() {
-        return name;
+    public String getInputPrompt() {
+        return inputPrompt;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setInputPrompt(String inputPrompt) {
+        this.inputPrompt = inputPrompt;
     }
 }

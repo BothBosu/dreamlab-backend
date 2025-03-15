@@ -35,7 +35,7 @@ public class ImageService {
             Files.copy(file.getInputStream(), this.root.resolve(fileName));
 
             Image image = new Image();
-            image.setName(fileName);
+            image.setInputPrompt(fileName);
             image.setUrl(this.root.resolve(fileName).toString());
 
             return imageRepository.save(image);

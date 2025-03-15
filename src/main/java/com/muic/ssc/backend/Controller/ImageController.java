@@ -3,6 +3,7 @@ package com.muic.ssc.backend.Controller;
 import com.muic.ssc.backend.Entity.Image;
 import com.muic.ssc.backend.Model.ImageGenPageModel.ImageGenRequest;
 import com.muic.ssc.backend.Model.ImageGenPageModel.ImageGenResponse;
+import com.muic.ssc.backend.Model.ImageGenPageModel.SaveImageRequest;
 import com.muic.ssc.backend.Model.ImageGenPageModel.SaveImageResponse;
 import com.muic.ssc.backend.Service.ImageGenService;
 import com.muic.ssc.backend.Service.ImageService;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/images")
@@ -49,9 +49,9 @@ public class ImageController {
      * @return response with the saved image information
      */
     @PostMapping("/save")
-    public ResponseEntity<SaveImageResponse> saveImage(@RequestBody com.muic.ssc.backend.model.SaveImageRequest request) {
+    public ResponseEntity<SaveImageResponse> saveImage(@RequestBody SaveImageRequest request) {
         try {
-            Image savedImage = imageGenService.saveGeneratedImage(request.getImageUrl(), request.getName());
+            Image savedImage = imageGenService.saveGeneratedImage(request.getImageUrl(), request.getInputPrompt());
 
             SaveImageResponse response = new SaveImageResponse(true, savedImage.getId(), "Image saved successfully");
             return ResponseEntity.ok(response);

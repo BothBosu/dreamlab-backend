@@ -5,13 +5,10 @@ import jakarta.persistence.*;
 
 @Entity
 public class Image {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String name;
-
+    private String inputPrompt;
     private String url;
 
     // Getters and setters
@@ -23,12 +20,12 @@ public class Image {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getInputPrompt() {
+        return inputPrompt;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setInputPrompt(String name) {
+        this.inputPrompt = name;
     }
 
     public String getUrl() {
