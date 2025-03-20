@@ -24,8 +24,8 @@ public class Image {
         return inputPrompt;
     }
 
-    public void setInputPrompt(String name) {
-        this.inputPrompt = name;
+    public void setInputPrompt(String inputPrompt) {
+        this.inputPrompt = inputPrompt;
     }
 
     public String getUrl() {
@@ -35,4 +35,5 @@ public class Image {
     public void setUrl(String url) {
         this.url = url;
     }
+
 }
