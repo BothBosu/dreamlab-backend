@@ -51,7 +51,7 @@ public class ImageController {
     @PostMapping("/save")
     public ResponseEntity<SaveImageResponse> saveImage(@RequestBody SaveImageRequest request) {
         try {
-            Image savedImage = imageGenService.saveGeneratedImage(request.getImageUrl(), request.getInputPrompt());
+            Image savedImage = imageService.saveImageUrl(request.getImageUrl(), request.getInputPrompt());
 
             SaveImageResponse response = new SaveImageResponse(true, savedImage.getId(), "Image saved successfully");
             return ResponseEntity.ok(response);
@@ -63,7 +63,7 @@ public class ImageController {
 
     @PostMapping("/upload")
     public ResponseEntity<Image> uploadImage(@RequestParam("file") MultipartFile file) {
-        Image image = imageService.save(file);
+        Image image = imageService.saveFile(file);
         return ResponseEntity.ok(image);
     }
 

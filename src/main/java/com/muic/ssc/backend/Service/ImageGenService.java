@@ -44,19 +44,4 @@ public class ImageGenService {
 
         return "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Test.svg/2560px-Test.svg.png";
     }
-
-    /**
-     * Save the generated image to the database
-     *
-     * @return the saved image entity
-     */
-    public Image saveGeneratedImage(String imageUrl, String name) {
-        logger.info("Saving generated image with name: {}", name);
-
-        Image image = new Image();
-        image.setInputPrompt(name);
-        image.setUrl(imageUrl);
-
-        return imageRepository.save(image);
-    }
 }
