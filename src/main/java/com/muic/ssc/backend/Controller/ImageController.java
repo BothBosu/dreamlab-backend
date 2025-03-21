@@ -78,6 +78,30 @@ public class ImageController {
     }
 
     /**
+     * Save a generated image to the database, linked to the current user
+     */
+    @PostMapping("/save")
+    public ResponseEntity<SaveImageResponse> saveImage(@RequestBody SaveImageRequest request) {
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Image savedImage = imageService.saveImageUrlForUser(
+                    request.getImageUrl(),
+                    request.getInputPrompt(),
+                    user.getId()
+            );
+
+            SaveImageResponse response = new SaveImageResponse(true, savedImage.getId(), "Image saved successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            SaveImageResponse response = new SaveImageResponse("Failed to save image: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    /**
      * Upload an image file and store it in S3, linked to the current user
      */
     @PostMapping("/upload")
