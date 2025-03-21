@@ -88,7 +88,7 @@ public class ImageController {
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            Image savedImage = imageService.saveImageUrlForUser(
+            Image savedImage = imageService.saveImageFromUrl(
                     request.getImageUrl(),
                     request.getInputPrompt(),
                     user.getId()
