@@ -45,21 +45,7 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
-
-        // Try to find a unique ID using our utility class
-        int attempts = 0;
-
-        while (attempts < MAX_ID_GENERATION_ATTEMPTS) {
-            Long randomId = IdGenerator.generateSixDigitId();
-
-            if (!userRepository.existsById(randomId)) {
-                user.setId(randomId);
-                return userRepository.save(user);
-            }
-            attempts++;
-        }
-
-        throw new RuntimeException("Failed to generate a unique user ID after multiple attempts");
+        return userRepository.save(user);
     }
 
     public List<User> getAllUsers() {
