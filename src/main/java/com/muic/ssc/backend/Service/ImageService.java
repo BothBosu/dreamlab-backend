@@ -1,7 +1,9 @@
 package com.muic.ssc.backend.Service;
 
 import com.muic.ssc.backend.Entity.Image;
+import com.muic.ssc.backend.Entity.User;
 import com.muic.ssc.backend.Repository.ImageRepository;
+import com.muic.ssc.backend.Repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,9 @@ public class ImageService {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
@@ -40,7 +45,6 @@ public class ImageService {
 
     private S3Client s3Client;
 
-    // ✅ Initialize S3Client after Spring injects the values
     @PostConstruct
     public void initS3Client() {
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
@@ -50,7 +54,7 @@ public class ImageService {
                 .build();
     }
 
-    public Image saveFile(MultipartFile file) {
+    public Image saveFileWithUser(MultipartFile file, Long userId) {
         try {
             String fileName = file.getOriginalFilename();
             Path tempFile = Files.createTempFile("upload-", fileName);
@@ -58,17 +62,21 @@ public class ImageService {
 
             String s3Url = uploadToS3(tempFile, fileName);
 
-            return saveImageUrl(s3Url, fileName);
+            return saveImageUrlForUser(s3Url, fileName, userId);
 
         } catch (Exception e) {
             throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
         }
     }
 
-    public Image saveImageUrl(String imageUrl, String name) {
+    public Image saveImageUrlForUser(String imageUrl, String name, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         Image image = new Image();
         image.setInputPrompt(name);
         image.setUrl(imageUrl);
+        image.setUser(user);
 
         return imageRepository.save(image);
     }
@@ -97,6 +105,12 @@ public class ImageService {
 
     public Optional<Image> getImageById(Long id) {
         return imageRepository.findById(id);
+    }
+
+    public List<Image> getImagesByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return imageRepository.findByUser(user);
     }
 
     public void deleteImage(Long id) {
