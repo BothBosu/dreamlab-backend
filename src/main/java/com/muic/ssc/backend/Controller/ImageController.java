@@ -1,14 +1,17 @@
 package com.muic.ssc.backend.Controller;
 
 import com.muic.ssc.backend.Entity.Image;
+import com.muic.ssc.backend.Entity.User;
 import com.muic.ssc.backend.Model.ImageGenPageModel.ImageGenRequest;
 import com.muic.ssc.backend.Model.ImageGenPageModel.ImageGenResponse;
 import com.muic.ssc.backend.Model.ImageGenPageModel.SaveImageRequest;
 import com.muic.ssc.backend.Model.ImageGenPageModel.SaveImageResponse;
+import com.muic.ssc.backend.Repository.UserRepository;
 import com.muic.ssc.backend.Service.ImageGenService;
 import com.muic.ssc.backend.Service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,11 +27,11 @@ public class ImageController {
     @Autowired
     private ImageGenService imageGenService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     /**
      * Generate an image based on the provided prompt and settings
-     * When a POST request is made to /api/images/generate, the generateImage method is called with the request body.
-     *
-     * @return response with the generated image URL
      */
     @PostMapping("/generate")
     public ResponseEntity<ImageGenResponse> generateImage(@RequestBody ImageGenRequest request) {
@@ -43,15 +46,20 @@ public class ImageController {
     }
 
     /**
-     * Save a generated image to the database
-     *
-     * @param request request containing image URL and name
-     * @return response with the saved image information
+     * Save a generated image to the database, linked to the current user
      */
     @PostMapping("/save")
     public ResponseEntity<SaveImageResponse> saveImage(@RequestBody SaveImageRequest request) {
         try {
-            Image savedImage = imageService.saveImageUrl(request.getImageUrl(), request.getInputPrompt());
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Image savedImage = imageService.saveImageUrlForUser(
+                    request.getImageUrl(),
+                    request.getInputPrompt(),
+                    user.getId()
+            );
 
             SaveImageResponse response = new SaveImageResponse(true, savedImage.getId(), "Image saved successfully");
             return ResponseEntity.ok(response);
@@ -61,18 +69,48 @@ public class ImageController {
         }
     }
 
+    /**
+     * Upload an image file and store it in S3, linked to the current user
+     */
     @PostMapping("/upload")
     public ResponseEntity<Image> uploadImage(@RequestParam("file") MultipartFile file) {
-        Image image = imageService.saveFile(file);
-        return ResponseEntity.ok(image);
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Image image = imageService.saveFileWithUser(file, user.getId());
+            return ResponseEntity.ok(image);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
-    @GetMapping
+    /**
+     * Get images for the currently authenticated user
+     */
+    @GetMapping("/user")
+    public ResponseEntity<List<Image>> getImagesForCurrentUser() {
+        try {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            List<Image> images = imageService.getImagesByUsername(username);
+            return ResponseEntity.ok(images);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * Get all images (public gallery)
+     */
+    @GetMapping("/all")
     public ResponseEntity<List<Image>> getAllImages() {
-        List<Image> images = imageService.getAllImages();
-        return ResponseEntity.ok(images);
+        return ResponseEntity.ok(imageService.getAllImages());
     }
 
+    /**
+     * Get image by ID
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Image> getImageById(@PathVariable Long id) {
         return imageService.getImageById(id)
@@ -80,9 +118,16 @@ public class ImageController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Delete image by ID
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
-        imageService.deleteImage(id);
-        return ResponseEntity.noContent().build();
+        try {
+            imageService.deleteImage(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }
