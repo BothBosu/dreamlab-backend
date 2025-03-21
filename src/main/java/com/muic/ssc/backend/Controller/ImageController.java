@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -105,16 +106,22 @@ public class ImageController {
      * Upload an image file and store it in S3, linked to the current user
      */
     @PostMapping("/upload")
-    public ResponseEntity<Image> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                return ResponseEntity.status(403).body("You must be logged in to upload an image.");
+            }
+
+            String username = auth.getName();
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             Image image = imageService.saveFileWithUser(file, user.getId());
             return ResponseEntity.ok(image);
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Failed to upload image: " + e.getMessage());
         }
     }
 
