@@ -17,10 +17,17 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ImageService {
@@ -45,6 +52,21 @@ public class ImageService {
 
     private S3Client s3Client;
 
+    // Map of file extensions to MIME types
+    private static final Map<String, String> CONTENT_TYPES = new HashMap<>();
+
+    static {
+        CONTENT_TYPES.put(".jpg", "image/jpeg");
+        CONTENT_TYPES.put(".jpeg", "image/jpeg");
+        CONTENT_TYPES.put(".png", "image/png");
+        CONTENT_TYPES.put(".gif", "image/gif");
+        CONTENT_TYPES.put(".bmp", "image/bmp");
+        CONTENT_TYPES.put(".webp", "image/webp");
+        CONTENT_TYPES.put(".svg", "image/svg+xml");
+        CONTENT_TYPES.put(".tiff", "image/tiff");
+        CONTENT_TYPES.put(".tif", "image/tiff");
+    }
+
     @PostConstruct
     public void initS3Client() {
         AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
@@ -60,13 +82,80 @@ public class ImageService {
             Path tempFile = Files.createTempFile("upload-", fileName);
             file.transferTo(tempFile);
 
-            String s3Url = uploadToS3(tempFile, fileName);
+            String s3Url = uploadToS3(tempFile, fileName, file.getContentType());
 
             return saveImageUrlForUser(s3Url, fileName, userId);
 
         } catch (Exception e) {
             throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
         }
+    }
+
+    public Image saveImageFromUrl(String imageUrl, String description, Long userId) {
+        try {
+            // Determine file extension and content type
+            String extension = determineFileExtension(imageUrl);
+            String contentType = getContentTypeFromExtension(extension);
+
+            // Generate a unique filename for S3
+            String fileName = UUID.randomUUID().toString() + extension;
+
+            // Download the image to a temporary file
+            Path tempFile = downloadImageFromUrl(imageUrl);
+
+            // Upload the temp file to S3 with correct content type
+            String s3Url = uploadToS3(tempFile, fileName, contentType);
+
+            // Clean up the temp file
+            Files.deleteIfExists(tempFile);
+
+            // Save the S3 URL in the database
+            return saveImageUrlForUser(s3Url, description, userId);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Could not process the image from URL. Error: " + e.getMessage());
+        }
+    }
+
+    private String getContentTypeFromExtension(String extension) {
+        return CONTENT_TYPES.getOrDefault(extension.toLowerCase(), "image/jpeg");
+    }
+
+    private Path downloadImageFromUrl(String imageUrl) throws Exception {
+        URL url = new URL(imageUrl);
+        URLConnection connection = url.openConnection();
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+        // Create a temporary file with a simple prefix
+        Path tempFile = Files.createTempFile("img-", null);
+
+        try (InputStream in = connection.getInputStream()) {
+            Files.copy(in, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return tempFile;
+    }
+
+    private String determineFileExtension(String imageUrl) {
+        // Remove query parameters for extension detection
+        String urlPath = imageUrl;
+        int queryIndex = urlPath.indexOf('?');
+        if (queryIndex > 0) {
+            urlPath = urlPath.substring(0, queryIndex);
+        }
+
+        // Try to extract extension from URL path
+        int dotPos = urlPath.lastIndexOf('.');
+        if (dotPos > 0 && dotPos < urlPath.length() - 1) {
+            String extension = urlPath.substring(dotPos).toLowerCase();
+            // Limit extension length to prevent issues
+            if (extension.length() <= 5) {
+                return extension;
+            }
+        }
+
+        // Default to .jpg if we can't determine
+        return ".jpg";
     }
 
     public Image saveImageUrlForUser(String imageUrl, String name, Long userId) {
@@ -81,10 +170,11 @@ public class ImageService {
         return imageRepository.save(image);
     }
 
-    private String uploadToS3(Path filePath, String fileName) {
+    private String uploadToS3(Path filePath, String fileName, String contentType) {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileName)
+                .contentType(contentType)  // Set the content type
                 .build();
 
         try {
