@@ -10,7 +10,9 @@ public class Image {
     private Long id;
 
     private String inputPrompt;
+    @Column(length = 1024)
     private String url;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
