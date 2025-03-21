@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,13 +30,24 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").permitAll()
+                        // Allow access to image generation endpoint without authentication
+                        .requestMatchers("/api/images/generate").permitAll()
+                        // Allow OPTIONS requests for CORS preflight
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.OPTIONS, "/**")).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Enable sessions
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Maintain session policy
                 )
                 .securityContext(securityContext -> securityContext
-                        .securityContextRepository(securityContextRepository) // Store authentication in session
+                        .securityContextRepository(securityContextRepository) // Keep session-based authentication
+                )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setContentType("application/json");
+                            response.setStatus(403);
+                            response.getWriter().write("{\"success\":false,\"message\":\"Authentication required\"}");
+                        })
                 );
 
         return http.build();
@@ -43,7 +55,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityContextRepository securityContextRepository() {
-        return new HttpSessionSecurityContextRepository(); // Use session-based authentication
+        return new HttpSessionSecurityContextRepository(); // Keep your session-based authentication
     }
 
     @Bean
