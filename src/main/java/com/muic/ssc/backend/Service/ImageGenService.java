@@ -6,6 +6,7 @@ import com.muic.ssc.backend.Repository.ImageRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,7 +15,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +32,8 @@ public class ImageGenService {
     private RestTemplate restTemplate;
 
     // Placeholder for API settings
-    private String apiKey = "key-NxVEIxOhxgQmT7Bkj07V8TgKhSvaUK1GhVTCCAwCeKHDKiPLZ9EPELd8Lq0qKVP54dPsniTPnIkvtvkkgToxLjfufBJKmXn";
+    @Value("${imagegen.api.key}")
+    private String API_KEY;
 
     /**
      * Generate an image based on the provided prompt and settings
@@ -69,7 +70,7 @@ public class ImageGenService {
                 .uri(URI.create("https://api.getimg.ai/v1/stable-diffusion-xl/text-to-image"))
                 .header("accept", "application/json")
                 .header("content-type", "application/json")
-                .header("authorization", "Bearer " + apiKey)
+                .header("authorization", "Bearer " + API_KEY)
                 .method("POST", HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
