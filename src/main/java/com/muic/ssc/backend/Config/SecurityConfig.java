@@ -29,13 +29,29 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
+                        // Authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Allow access to image generation endpoint without authentication
+
+                        // Public API endpoints
                         .requestMatchers("/api/images/generate").permitAll()
+                        .requestMatchers("/api/images/all").permitAll()
+                        .requestMatchers("/api/likes/*/count").permitAll()
+
+                        // Protected API endpoints
+                        .requestMatchers("/api/images/save").authenticated()
+                        .requestMatchers("/api/images/upload").authenticated()
+                        .requestMatchers("/api/images/user").authenticated()
+                        .requestMatchers("/api/images/*/share").authenticated()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.DELETE, "/api/images/**")).authenticated()
+                        .requestMatchers("/api/likes/*/toggle").authenticated()
+
                         // Allow OPTIONS requests for CORS preflight
                         .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.OPTIONS, "/**")).permitAll()
-                        .requestMatchers("/api/images/**").permitAll()
-                        .requestMatchers("/api/likes/*/count").permitAll()
+
+                        // For image/{id} endpoint, use custom authorization in the controller
+                        .requestMatchers("/api/images/*").permitAll()
+
+                        // Default access for any other endpoint
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
