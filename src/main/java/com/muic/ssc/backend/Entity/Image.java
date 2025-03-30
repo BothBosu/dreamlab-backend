@@ -20,6 +20,8 @@ public class Image {
     @JsonIgnore
     private User user;
 
+    private boolean isPublic = false; // Default: private
+
     // Getters and setters
 
     public Long getId() {
@@ -52,5 +54,13 @@ public class Image {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }
