@@ -79,7 +79,7 @@ public class SecurityConfig {
                 "https://dreamlab-ai.online", // Production domain
                 "http://dreamlab-ai.online" // Allow HTTP version
         ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 
