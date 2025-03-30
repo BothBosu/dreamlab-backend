@@ -3,8 +3,10 @@ package com.muic.ssc.backend.Service;
 import com.muic.ssc.backend.Entity.Image;
 import com.muic.ssc.backend.Entity.User;
 import com.muic.ssc.backend.Repository.ImageRepository;
+import com.muic.ssc.backend.Repository.LikeRepository;
 import com.muic.ssc.backend.Repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,9 @@ public class ImageService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
 
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
@@ -204,11 +209,19 @@ public class ImageService {
         return imageRepository.findByUser(user);
     }
 
+    @Transactional
     public void deleteImage(Long id) {
         Optional<Image> imageOptional = imageRepository.findById(id);
         if (imageOptional.isPresent()) {
             Image image = imageOptional.get();
+
+            // First, delete all likes associated with this image
+            likeRepository.deleteByImageId(id);
+
+            // Then delete the image from S3
             deleteFromS3(image.getUrl());
+
+            // Finally, delete the image record from the database
             imageRepository.deleteById(id);
         } else {
             throw new RuntimeException("Image not found with id " + id);
