@@ -166,6 +166,7 @@ public class ImageService {
         image.setInputPrompt(name);
         image.setUrl(imageUrl);
         image.setUser(user);
+        image.setPublic(false);
 
         return imageRepository.save(image);
     }
@@ -190,7 +191,7 @@ public class ImageService {
     }
 
     public List<Image> getAllImages() {
-        return imageRepository.findAll();
+        return imageRepository.findByIsPublicTrue();
     }
 
     public Optional<Image> getImageById(Long id) {
@@ -223,4 +224,17 @@ public class ImageService {
 
         s3Client.deleteObject(deleteObjectRequest);
     }
+
+    public Image updateImageVisibility(Long imageId, String username, boolean isPublic) {
+        Image image = imageRepository.findById(imageId)
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        if (!image.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("Unauthorized to update this image");
+        }
+
+        image.setPublic(isPublic);
+        return imageRepository.save(image);
+    }
+
 }
