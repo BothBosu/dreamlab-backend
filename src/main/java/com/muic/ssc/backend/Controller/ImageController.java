@@ -147,6 +147,18 @@ public class ImageController {
         return ResponseEntity.ok(imageService.getAllImages());
     }
 
+    @PatchMapping("/{id}/share")
+    public ResponseEntity<?> updateImageVisibility(@PathVariable Long id, @RequestParam boolean isPublic) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        try {
+            Image updatedImage = imageService.updateImageVisibility(id, username, isPublic);
+            return ResponseEntity.ok(updatedImage);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
+    }
+
     /**
      * Get image by ID
      */
