@@ -196,7 +196,17 @@ public class ImageService {
     }
 
     public List<Image> getAllImages() {
-        return imageRepository.findByIsPublicTrue();
+        try {
+            List<Image> images = imageRepository.findByIsPublicTrue();
+            return images;
+        } catch (Exception e) {
+            // Log the error with details
+            System.err.println("Error retrieving public images: " + e.getMessage());
+            e.printStackTrace();
+
+            // Return an empty list instead of letting the exception propagate
+            return List.of();
+        }
     }
 
     public Optional<Image> getImageById(Long id) {

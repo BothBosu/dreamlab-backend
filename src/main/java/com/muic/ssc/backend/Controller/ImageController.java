@@ -166,7 +166,15 @@ public class ImageController {
      */
     @GetMapping("/all")
     public ResponseEntity<List<Image>> getAllImages() {
-        return ResponseEntity.ok(imageService.getAllImages());
+        logger.info("Received request to get all images");
+        try {
+            List<Image> images = imageService.getAllImages();
+            logger.info("Retrieved {} images", images.size());
+            return ResponseEntity.ok(images);
+        } catch (Exception e) {
+            logger.error("Error retrieving all images", e);
+            throw e;
+        }
     }
 
     /**

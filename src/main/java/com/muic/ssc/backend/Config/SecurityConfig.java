@@ -1,5 +1,6 @@
 package com.muic.ssc.backend.Config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -33,17 +35,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
 
                         // Public API endpoints
-                        .requestMatchers("/api/images/generate").permitAll()
-                        .requestMatchers("/api/images/all").permitAll()
+                        .requestMatchers("/api/images/generate/**").permitAll()
+                        .requestMatchers("/api/images/all/**").permitAll()
                         .requestMatchers("/api/likes/*/count").permitAll()
 
                         // Protected API endpoints
-                        .requestMatchers("/api/images/save").authenticated()
-                        .requestMatchers("/api/images/upload").authenticated()
-                        .requestMatchers("/api/images/user").authenticated()
-                        .requestMatchers("/api/images/*/share").authenticated()
+                        .requestMatchers("/api/images/save/**").authenticated()
+                        .requestMatchers("/api/images/upload/**").authenticated()
+                        .requestMatchers("/api/images/user/**").authenticated()
+                        .requestMatchers("/api/images/*/share/**").authenticated()
                         .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.DELETE, "/api/images/**")).authenticated()
-                        .requestMatchers("/api/likes/*/toggle").authenticated()
+                        .requestMatchers("/api/likes/*/toggle/**").authenticated()
 
                         // Allow OPTIONS requests for CORS preflight
                         .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.OPTIONS, "/**")).permitAll()

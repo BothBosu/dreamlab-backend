@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -59,7 +60,8 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // Store authentication in session
-            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                    SecurityContextHolder.getContext());
 
             return ResponseEntity.ok(new LoginResponse("Login successful", authentication.getName()));
         } catch (Exception e) {
