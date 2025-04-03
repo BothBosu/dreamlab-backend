@@ -37,7 +37,7 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public User registerNewUser(String username, String password) {
+    public User registerNewUser(String username, String password, String profilePicture) {
         if (userRepository.existsByUsername(username)) {
             throw new RuntimeException("Username is already taken");
         }
@@ -45,6 +45,12 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
+
+        // Set profile picture if provided, otherwise use default
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            user.setProfilePicture(profilePicture);
+        }
+
         return userRepository.save(user);
     }
 
@@ -54,5 +60,40 @@ public class UserService implements UserDetailsService {
 
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public boolean updatePassword(String username, String currentPassword, String newPassword) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+
+        User user = userOptional.get();
+
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return false;
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return true;
+    }
+
+    public boolean updateProfilePicture(String username, String profilePicture) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+
+        User user = userOptional.get();
+        user.setProfilePicture(profilePicture);
+        userRepository.save(user);
+
+        return true;
     }
 }

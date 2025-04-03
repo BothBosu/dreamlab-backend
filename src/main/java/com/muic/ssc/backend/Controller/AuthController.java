@@ -1,5 +1,6 @@
 package com.muic.ssc.backend.Controller;
 
+import com.muic.ssc.backend.Entity.User;
 import com.muic.ssc.backend.Model.LoginPageModel.LoginRequest;
 import com.muic.ssc.backend.Model.LoginPageModel.LoginResponse;
 import com.muic.ssc.backend.Model.RegisterPageModel.RegisterRequest;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -35,7 +37,8 @@ public class AuthController {
         try {
             userService.registerNewUser(
                     registerRequest.getUsername(),
-                    registerRequest.getPassword()
+                    registerRequest.getPassword(),
+                    registerRequest.getProfilePicture()
             );
 
             return ResponseEntity.ok(new RegisterResponse("User registered successfully", true));
@@ -63,9 +66,16 @@ public class AuthController {
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                     SecurityContextHolder.getContext());
 
-            return ResponseEntity.ok(new LoginResponse("Login successful", authentication.getName()));
+            // Get user profile picture
+            String profilePicture = null;
+            Optional<User> userOptional = userService.findByUsername(authentication.getName());
+            if (userOptional.isPresent()) {
+                profilePicture = userOptional.get().getProfilePicture();
+            }
+
+            return ResponseEntity.ok(new LoginResponse("Login successful", authentication.getName(), profilePicture, true));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new LoginResponse("Login failed: " + e.getMessage(), null));
+            return ResponseEntity.badRequest().body(new LoginResponse("Login failed: " + e.getMessage(), null, null, false));
         }
     }
 
@@ -75,10 +85,44 @@ public class AuthController {
 
         if (authentication != null && authentication.isAuthenticated() &&
                 !authentication.getPrincipal().equals("anonymousUser")) {
-            return ResponseEntity.ok(new LoginResponse("Authenticated", authentication.getName()));
+
+            // Get user profile picture for status check
+            String profilePicture = null;
+            Optional<User> userOptional = userService.findByUsername(authentication.getName());
+            if (userOptional.isPresent()) {
+                profilePicture = userOptional.get().getProfilePicture();
+            }
+
+            return ResponseEntity.ok(new LoginResponse("Authenticated", authentication.getName(), profilePicture, true));
         }
 
-        return ResponseEntity.ok(new LoginResponse("Not authenticated", null));
+        return ResponseEntity.ok(new LoginResponse("Not authenticated", null, null, false));
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<?> checkAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated() &&
+                !authentication.getPrincipal().equals("anonymousUser")) {
+
+            // Get user profile picture
+            String profilePicture = null;
+            Optional<User> userOptional = userService.findByUsername(authentication.getName());
+            if (userOptional.isPresent()) {
+                profilePicture = userOptional.get().getProfilePicture();
+            }
+
+            return ResponseEntity.ok(
+                    java.util.Map.of(
+                            "authenticated", true,
+                            "username", authentication.getName(),
+                            "profilePicture", profilePicture != null ? profilePicture : "avatar1.png"
+                    )
+            );
+        }
+
+        return ResponseEntity.ok(java.util.Map.of("authenticated", false));
     }
 
     @PostMapping("/logout")
