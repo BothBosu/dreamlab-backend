@@ -37,7 +37,7 @@ public class UserService implements UserDetailsService {
         );
     }
 
-    public User registerNewUser(String username, String password) {
+    public User registerNewUser(String username, String password, String profilePicture) {
         if (userRepository.existsByUsername(username)) {
             throw new RuntimeException("Username is already taken");
         }
@@ -45,6 +45,12 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
+
+        // Set profile picture if provided, otherwise use default
+        if (profilePicture != null && !profilePicture.isEmpty()) {
+            user.setProfilePicture(profilePicture);
+        }
+
         return userRepository.save(user);
     }
 
@@ -72,6 +78,20 @@ public class UserService implements UserDetailsService {
 
         // Update password
         user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return true;
+    }
+
+    public boolean updateProfilePicture(String username, String profilePicture) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+
+        User user = userOptional.get();
+        user.setProfilePicture(profilePicture);
         userRepository.save(user);
 
         return true;
