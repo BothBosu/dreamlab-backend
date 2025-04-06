@@ -78,7 +78,7 @@ Connects to [dreamlab-frontend](https://github.com/BothBosu/dreamlab-frontend)
 - MySQL
 - AWS credentials (for S3)
 
-# Start backend service
+## Start backend service
 
 ```bash
 mvn wrapper:wrapper
