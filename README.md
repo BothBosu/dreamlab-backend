@@ -2,25 +2,35 @@
 
 Dream Lab is a community-driven AI image generation platform. This backend repo is built with Spring Boot and serves REST APIs for user authentication, image generation, storage, and community interactions.
 
+## 🧱 System Architecture
+
+![image](https://github.com/user-attachments/assets/99a709ef-2d21-4d5d-bab0-d12cc1995713)
+
+The system runs on a cloud VM with:
+- A Vue.js frontend served through Nginx
+- A Spring Boot backend that exposes REST APIs
+- Controllers and services for user, image, and social features
+- External services like AWS S3 and getimg.ai for image management
+
 ## 🎯 Core Functionalities
 
-### ✅ User Management
+### User Management
 - Register/Login system
 - Spring Security authentication
 - Password change & profile picture management
 
-### ✅ AI Image Generation
+### AI Image Generation
 - Integration with [getimg.ai](https://getimg.ai/) API
 - Customizable image prompt settings
 - Metadata storage (prompt, image url, user id)
 
-### ✅ Community & Storage
+### Community & Storage
 - Like system for images
 - Public gallery feed
 - Image metadata storage in SQL
 - Secure image hosting via AWS S3
 
-### ✅ Dashboard
+### Dashboard
 - User-specific dashboard for managing generated images
 
 ## 🧰 Tech Stack
@@ -55,7 +65,8 @@ src/
 - **Pawin**: Image generation page, user management system
 - **Szuchihsu**: Gallery, dashboard, AWS S3 integration
 
-🌍 Frontend
+## 🌍 Frontend
+
 Connects to [dreamlab-frontend](https://github.com/BothBosu/dreamlab-frontend)
 
 ## 🛠 Running the Project
