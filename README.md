@@ -1,13 +1,13 @@
 # Dream Lab — Backend
 
-Dream Lab is a community-driven AI image generation platform. This backend repo is built with Spring Boot and serves REST APIs for user authentication, image generation, storage, and community interactions.
+Dream Lab is a community-driven AI image generation platform. This backend repo is built with Spring Boot, MySQL and serves REST APIs for user authentication, image generation, storage, and community interactions.
 
 ## 🧱 System Architecture
 
 ![image](https://github.com/user-attachments/assets/99a709ef-2d21-4d5d-bab0-d12cc1995713)
 
 The system runs on a cloud VM with:
-- A Vue.js frontend served through Nginx
+- A Vue.ts frontend served through Nginx
 - A Spring Boot backend that exposes REST APIs
 - Controllers and services for user, image, and social features
 - External services like AWS S3 and getimg.ai for image management
